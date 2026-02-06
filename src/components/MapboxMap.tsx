@@ -23,6 +23,150 @@ interface MapboxMapProps {
   selectedMarkerIndex?: number | null;
   hoveredMarkerIndex?: number | null;
   onMarkerClick?: (index: number, position: [number, number]) => void;
+  onLocationFound?: (location: [number, number]) => void;
+}
+
+interface GeolocationControlOptions extends L.ControlOptions {
+  onLocationFound?: (location: [number, number]) => void;
+}
+
+// Custom Geolocation Control for Leaflet (similar to Mapbox GeolocateControl)
+class GeolocationControl extends L.Control {
+  private onLocationFound?: (location: [number, number]) => void;
+  private locating: boolean = false;
+
+  constructor(options?: GeolocationControlOptions) {
+    super({ position: 'bottomright', ...options });
+    this.onLocationFound = options?.onLocationFound;
+  }
+
+  onAdd(map: L.Map): HTMLElement {
+    const container = L.DomUtil.create('div', 'leaflet-bar leaflet-control');
+    container.style.borderRadius = '4px';
+    container.style.overflow = 'hidden';
+    container.style.boxShadow = '0 2px 4px rgba(0,0,0,0.2)';
+
+    const button = L.DomUtil.create('a', '', container);
+    button.href = '#';
+    button.title = 'Find my location';
+    button.style.cssText = `
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 30px;
+      height: 30px;
+      background: white;
+      cursor: pointer;
+      transition: background 0.2s;
+    `;
+    button.innerHTML = `
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#333" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="12" cy="12" r="3"/>
+        <path d="M12 2v4M12 18v4M2 12h4M18 12h4"/>
+      </svg>
+    `;
+
+    // Hover effect
+    button.addEventListener('mouseenter', () => {
+      button.style.background = '#f5f5f5';
+    });
+    button.addEventListener('mouseleave', () => {
+      button.style.background = 'white';
+    });
+
+    L.DomEvent.on(button, 'click', (e) => {
+      L.DomEvent.preventDefault(e);
+      L.DomEvent.stopPropagation(e);
+
+      if (this.locating) return;
+
+      if (!navigator.geolocation) {
+        alert('Geolocation is not supported by your browser');
+        return;
+      }
+
+      this.locating = true;
+      button.innerHTML = `
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#3b82f6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="animate-spin">
+          <circle cx="12" cy="12" r="10" stroke-dasharray="60" stroke-dashoffset="20"/>
+        </svg>
+      `;
+
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          const { latitude, longitude } = position.coords;
+          const location: [number, number] = [latitude, longitude];
+
+          // Center map on location
+          map.setView(location, 15);
+
+          // Call the callback
+          this.onLocationFound?.(location);
+
+          // Reset button
+          this.locating = false;
+          button.innerHTML = `
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#10b981" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="12" cy="12" r="3"/>
+              <path d="M12 2v4M12 18v4M2 12h4M18 12h4"/>
+            </svg>
+          `;
+
+          // Reset to normal after 2 seconds
+          setTimeout(() => {
+            button.innerHTML = `
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#333" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="12" cy="12" r="3"/>
+                <path d="M12 2v4M12 18v4M2 12h4M18 12h4"/>
+              </svg>
+            `;
+          }, 2000);
+        },
+        (error) => {
+          console.error('Geolocation error:', error);
+          let message = 'Unable to get your location';
+          switch (error.code) {
+            case error.PERMISSION_DENIED:
+              message = 'Location access denied';
+              break;
+            case error.POSITION_UNAVAILABLE:
+              message = 'Location unavailable';
+              break;
+            case error.TIMEOUT:
+              message = 'Location request timed out';
+              break;
+          }
+          alert(message);
+
+          // Reset button
+          this.locating = false;
+          button.innerHTML = `
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#ef4444" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="12" cy="12" r="3"/>
+              <path d="M12 2v4M12 18v4M2 12h4M18 12h4"/>
+            </svg>
+          `;
+
+          // Reset to normal after 2 seconds
+          setTimeout(() => {
+            button.innerHTML = `
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#333" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="12" cy="12" r="3"/>
+                <path d="M12 2v4M12 18v4M2 12h4M18 12h4"/>
+              </svg>
+            `;
+          }, 2000);
+        },
+        {
+          enableHighAccuracy: true,
+          timeout: 10000,
+          maximumAge: 60000
+        }
+      );
+    });
+
+    return container;
+  }
 }
 
 export function MapboxMap({ 
@@ -35,7 +179,8 @@ export function MapboxMap({
   height = '100%',
   selectedMarkerIndex = null,
   hoveredMarkerIndex = null,
-  onMarkerClick
+  onMarkerClick,
+  onLocationFound
 }: MapboxMapProps) {
   const mapRef = useRef<HTMLDivElement>(null);
   const leafletMapRef = useRef<L.Map | null>(null);
@@ -67,6 +212,13 @@ export function MapboxMap({
     L.control.zoom({
       position: 'bottomright'
     }).addTo(map);
+
+    // Add geolocation control (like Mapbox GeolocateControl)
+    const geolocateControl = new GeolocationControl({
+      position: 'bottomright',
+      onLocationFound
+    });
+    geolocateControl.addTo(map);
 
     // Create layer group for markers
     const markersLayer = L.layerGroup().addTo(map);

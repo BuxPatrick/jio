@@ -79,6 +79,7 @@ interface ListingsLayoutProps {
   }>
   userLocation?: [number, number] | null
   onListingClick?: (index: number, coordinates: [number, number]) => void
+  onLocationFound?: (location: [number, number]) => void
 }
 
 function Tab({ label, icon, isActive, onClick }: TabProps) {
@@ -164,7 +165,7 @@ function ListingCard({ title, rating, description, details, price, period, image
   )
 }
 
-function MapView({ center, markers, userLocation, targetLocation, distance, onListingClick, selectedMarkerIndex, hoveredMarkerIndex }: MapViewProps) {
+function MapView({ center, markers, userLocation, targetLocation, distance, onListingClick, selectedMarkerIndex, hoveredMarkerIndex, onLocationFound }: MapViewProps & { onLocationFound?: (location: [number, number]) => void }) {
   const [isMapView, setIsMapView] = useState(false)
 
   return (
@@ -176,12 +177,13 @@ function MapView({ center, markers, userLocation, targetLocation, distance, onLi
       distance={distance}
       selectedMarkerIndex={selectedMarkerIndex}
       hoveredMarkerIndex={hoveredMarkerIndex}
+      onLocationFound={onLocationFound}
       height="100%"
     />
   )
 }
 
-function ListingsLayout({ listings, mapCenter, mapMarkers = [], userLocation, targetLocation, distance, onListingClick, listingsWithCoords, onDistanceClick, distances, selectedMarkerIndex }: Omit<ListingsLayoutProps, 'title'> & { listingsWithCoords?: ResourceListing[], onDistanceClick?: (index: number) => void, distances?: Record<number, string>, targetLocation?: [number, number] | null, distance?: string | null, selectedMarkerIndex?: number | null }) {
+function ListingsLayout({ listings, mapCenter, mapMarkers = [], userLocation, targetLocation, distance, onListingClick, listingsWithCoords, onDistanceClick, distances, selectedMarkerIndex, onLocationFound }: Omit<ListingsLayoutProps, 'title'> & { listingsWithCoords?: ResourceListing[], onDistanceClick?: (index: number) => void, distances?: Record<number, string>, targetLocation?: [number, number] | null, distance?: string | null, selectedMarkerIndex?: number | null }) {
   const [selectedIndex, setSelectedIndex] = useState<number | null>(null)
   const [hoveredIndex, setHoveredIndex] = useState<number | null>(null)
 
@@ -225,7 +227,7 @@ function ListingsLayout({ listings, mapCenter, mapMarkers = [], userLocation, ta
 
       {/* Right side - Map */}
       <div className="w-[45%] min-w-[350px] pl-4">
-        <MapView center={mapCenter} markers={mapMarkers} userLocation={userLocation} targetLocation={targetLocation} distance={distance} selectedMarkerIndex={selectedIndex} hoveredMarkerIndex={hoveredIndex} />
+        <MapView center={mapCenter} markers={mapMarkers} userLocation={userLocation} targetLocation={targetLocation} distance={distance} selectedMarkerIndex={selectedIndex} hoveredMarkerIndex={hoveredIndex} onLocationFound={onLocationFound} />
       </div>
     </div>
   )
@@ -257,9 +259,15 @@ export default function App() {
     const [activeSubTab, setActiveSubTab] = useState('consulates')
     const [selectedListingCoords, setSelectedListingCoords] = useState<[number, number] | null>(null)
     const [distanceInfo, setDistanceInfo] = useState<{index: number, distance: string} | null>(null)
+    const [userLocation, setUserLocation] = useState<[number, number] | null>(null)
 
-    // Fake user location in French Quarter, New Orleans
-    const fakeUserLocation: [number, number] = [29.9583, -90.0639]
+    // Default fallback location (New Orleans French Quarter)
+    const defaultLocation: [number, number] = [29.9583, -90.0639]
+
+    // Handle location found from map geolocate control
+    const handleLocationFound = (location: [number, number]) => {
+      setUserLocation(location)
+    }
 
     const subTabs = [
       { id: 'consulates', label: 'Consulates', icon: <Building2 size={16} /> },
@@ -288,9 +296,9 @@ export default function App() {
         return
       }
       const listing = currentListings[index]
-      if (listing?.coordinates) {
+      if (listing?.coordinates && userLocation) {
         const [lat, lng] = listing.coordinates
-        const distance = calculateDistance(fakeUserLocation[0], fakeUserLocation[1], lat, lng)
+        const distance = calculateDistance(userLocation[0], userLocation[1], lat, lng)
         setDistanceInfo({ index, distance: distance.toFixed(1) })
       }
     }
@@ -658,7 +666,7 @@ export default function App() {
             listings={listingsToShow}
             mapCenter={mapCenter}
             mapMarkers={mapMarkers}
-            userLocation={fakeUserLocation}
+            userLocation={userLocation || defaultLocation}
             targetLocation={distanceInfo ? currentListings[distanceInfo.index]?.coordinates || null : null}
             distance={distanceInfo?.distance || null}
             onListingClick={(index, coords) => {
@@ -668,6 +676,7 @@ export default function App() {
             listingsWithCoords={currentListings}
             onDistanceClick={handleDistanceClick}
             distances={distances}
+            onLocationFound={handleLocationFound}
           />
         </div>
       </div>
