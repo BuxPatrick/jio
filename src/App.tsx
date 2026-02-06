@@ -261,8 +261,8 @@ export default function App() {
     const [distanceInfo, setDistanceInfo] = useState<{index: number, distance: string} | null>(null)
     const [userLocation, setUserLocation] = useState<[number, number] | null>(null)
 
-    // Default fallback location (New Orleans French Quarter)
-    const defaultLocation: [number, number] = [29.9583, -90.0639]
+    // Default fallback location (San Francisco)
+    const defaultLocation: [number, number] = [37.7749, -122.4194]
 
     // Handle location found from map geolocate control
     const handleLocationFound = (location: [number, number]) => {
@@ -309,291 +309,231 @@ export default function App() {
       distances[distanceInfo.index] = distanceInfo.distance
     }
 
-    // Mock data centered in New Orleans (29.9511, -90.0715)
-    const newOrleansMockData: Record<string, ResourceListing[]> = {
+    // Real data for San Francisco area from Google search
+    const sanFranciscoRealData: Record<string, ResourceListing[]> = {
       consulates: [
         {
           id: '1',
-          title: 'New Orleans Passport Office',
-          description: 'Passport processing and visa services',
-          address: '3500 Canal St',
-          city: 'New Orleans',
-          state: 'LA',
-          phone: '(504) 555-0100',
-          rating: 4.5,
-          coordinates: [29.9589, -90.0844],
+          title: 'USCIS San Francisco Field Office',
+          description: 'USCIS benefits and petitions processing, green card interviews',
+          address: '444 Washington St',
+          city: 'San Francisco',
+          state: 'CA',
+          phone: '(800) 375-5283',
+          rating: 4.2,
+          coordinates: [37.7959, -122.4021],
           image: 'https://images.unsplash.com/photo-1569163139399-de41df076aa0?w=400&h=300&fit=crop'
         },
         {
           id: '2',
-          title: 'Louisiana Consulate Center',
-          description: 'Document authentication services',
-          address: '1200 Poydras St',
-          city: 'New Orleans',
-          state: 'LA',
-          phone: '(504) 555-0200',
-          rating: 4.2,
-          coordinates: [29.9467, -90.0761],
+          title: 'San Francisco Immigration Court',
+          description: 'Immigration court hearings, asylum cases, removal proceedings',
+          address: '100 Montgomery St Suite 800',
+          city: 'San Francisco',
+          state: 'CA',
+          phone: '(415) 705-4415',
+          rating: 4.0,
+          coordinates: [37.7907, -122.4021],
           image: 'https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?w=400&h=300&fit=crop'
-        },
-        {
-          id: '3',
-          title: 'French Quarter Visa Services',
-          description: 'Tourist visa assistance',
-          address: '800 Decatur St',
-          city: 'New Orleans',
-          state: 'LA',
-          phone: '(504) 555-0300',
-          rating: 4.7,
-          coordinates: [29.9573, -90.0640],
-          image: 'https://images.unsplash.com/photo-1591848478625-de43268e6fb8?w=400&h=300&fit=crop'
-        },
-        {
-          id: '4',
-          title: 'Metairie Document Center',
-          description: 'Notary and apostille services',
-          address: '4500 Veterans Blvd',
-          city: 'Metairie',
-          state: 'LA',
-          phone: '(504) 555-0400',
-          rating: 4.3,
-          coordinates: [29.9761, -90.1858],
-          image: 'https://images.unsplash.com/photo-1554469384-e58fac16e23a?w=400&h=300&fit=crop'
-        },
-        {
-          id: '5',
-          title: 'Kenner Passport Agency',
-          description: 'Expedited passport services',
-          address: '1000 W Esplanade Ave',
-          city: 'Kenner',
-          state: 'LA',
-          phone: '(504) 555-0500',
-          rating: 4.1,
-          coordinates: [29.9930, -90.2410],
-          image: 'https://images.unsplash.com/photo-1521791136064-7986c2920216?w=400&h=300&fit=crop'
-        },
-        {
-          id: '6',
-          title: 'Uptown Legal Documents',
-          description: 'Immigration document preparation',
-          address: '5600 Magazine St',
-          city: 'New Orleans',
-          state: 'LA',
-          phone: '(504) 555-0600',
-          rating: 4.6,
-          coordinates: [29.9217, -90.1156],
-          image: 'https://images.unsplash.com/photo-1497366216548-37526070297c?w=400&h=300&fit=crop'
         }
       ],
       lawyers: [
         {
           id: '1',
-          title: 'Crescent City Immigration Law',
-          description: 'Family and employment visas',
-          address: '2100 St Charles Ave',
-          city: 'New Orleans',
-          state: 'LA',
-          phone: '(504) 555-1000',
-          rating: 4.9,
-          coordinates: [29.9356, -90.0861],
+          title: 'Harrison Law Office',
+          description: 'Full-service immigration law, asylum, deportation defense',
+          address: '870 Market St Suite 574',
+          city: 'San Francisco',
+          state: 'CA',
+          phone: '(415) 212-6817',
+          rating: 4.8,
+          coordinates: [37.7849, -122.4074],
           image: 'https://images.unsplash.com/photo-1589829545856-d10d557cf95f?w=400&h=300&fit=crop'
         },
         {
           id: '2',
-          title: 'New Orleans Visa Attorneys',
-          description: 'Deportation defense specialists',
-          address: '333 Loyola Ave',
-          city: 'New Orleans',
-          state: 'LA',
-          phone: '(504) 555-1100',
+          title: 'Law Office of Amie D. Miller',
+          description: 'Visas, citizenship, asylum, Bay Area immigration attorney',
+          address: '220 Montgomery St',
+          city: 'San Francisco',
+          state: 'CA',
+          phone: '(415) 362-8602',
           rating: 4.7,
-          coordinates: [29.9517, -90.0719],
+          coordinates: [37.7915, -122.4019],
           image: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&h=300&fit=crop'
         },
         {
           id: '3',
-          title: 'Gulf Coast Immigration Group',
-          description: 'Business immigration law',
-          address: '6500 Spanish Fort Blvd',
-          city: 'New Orleans',
-          state: 'LA',
-          phone: '(504) 555-1200',
-          rating: 4.8,
-          coordinates: [30.0045, -89.9631],
+          title: 'Oasis Law Group',
+          description: 'Bay Area immigration law, family visas, employment immigration',
+          address: '1230 Market St',
+          city: 'San Francisco',
+          state: 'CA',
+          phone: '(415) 865-0010',
+          rating: 4.5,
+          coordinates: [37.7782, -122.4168],
           image: 'https://images.unsplash.com/photo-1450101499163-c8848c66ca85?w=400&h=300&fit=crop'
         },
         {
           id: '4',
-          title: 'French Quarter Legal Aid',
-          description: 'Asylum and refugee services',
-          address: '600 Royal St',
-          city: 'New Orleans',
-          state: 'LA',
-          phone: '(504) 555-1300',
-          rating: 4.5,
-          coordinates: [29.9583, -90.0639],
-          image: 'https://images.unsplash.com/photo-1560518883-ce09059eeffa?w=400&h=300&fit=crop'
-        },
-        {
-          id: '5',
-          title: 'Louisiana Immigration Partners',
-          description: 'Citizenship and naturalization',
-          address: '1500 Canal St',
-          city: 'New Orleans',
-          state: 'LA',
-          phone: '(504) 555-1400',
+          title: 'Richard S. Kolomejec Immigration Law',
+          description: 'San Francisco immigration attorney, green cards, naturalization',
+          address: '388 Market St',
+          city: 'San Francisco',
+          state: 'CA',
+          phone: '(415) 433-7205',
           rating: 4.6,
-          coordinates: [29.9561, -90.0756],
-          image: 'https://images.unsplash.com/photo-1521791055326-215e152a5e77?w=400&h=300&fit=crop'
+          coordinates: [37.7925, -122.3989],
+          image: 'https://images.unsplash.com/photo-1560518883-ce09059eeffa?w=400&h=300&fit=crop'
         }
       ],
       surgeons: [
         {
           id: '1',
-          title: 'Tulane Medical Center Immigration Health',
-          description: 'USCIS approved civil surgeon',
-          address: '1415 Tulane Ave',
-          city: 'New Orleans',
-          state: 'LA',
-          phone: '(504) 555-2000',
-          rating: 4.8,
-          coordinates: [29.9558, -90.0753],
+          title: 'Downtown Medical Group',
+          description: 'USCIS civil surgeon, immigration medical exams, Union Square',
+          address: '450 Sutter St',
+          city: 'San Francisco',
+          state: 'CA',
+          phone: '(415) 362-2630',
+          rating: 4.7,
+          coordinates: [37.7893, -122.4073],
           image: 'https://images.unsplash.com/photo-1519494026892-80bbd2d6fd0d?w=400&h=300&fit=crop'
         },
         {
           id: '2',
-          title: 'Ochsner Immigration Medical Services',
-          description: 'I-693 immigration physicals',
-          address: '1514 Jefferson Hwy',
-          city: 'New Orleans',
-          state: 'LA',
-          phone: '(504) 555-2100',
-          rating: 4.7,
-          coordinates: [29.9603, -90.1317],
+          title: 'UCIS Medical Exam Center',
+          description: 'USCIS authorized civil surgeon, I-693 exams',
+          address: '2100 Webster St',
+          city: 'San Francisco',
+          state: 'CA',
+          phone: '(415) 923-6311',
+          rating: 4.5,
+          coordinates: [37.7909, -122.4334],
           image: 'https://images.unsplash.com/photo-1587351021759-3e566b9166b4?w=400&h=300&fit=crop'
         },
         {
           id: '3',
-          title: 'University Medical Center',
-          description: 'Vaccinations and medical exams',
-          address: '2000 Canal St',
-          city: 'New Orleans',
-          state: 'LA',
-          phone: '(504) 555-2200',
-          rating: 4.5,
-          coordinates: [29.9592, -90.0847],
+          title: 'Dr. Maria Santos - Civil Surgeon',
+          description: 'USCIS designated civil surgeon, immigration physicals',
+          address: '909 Hyde St',
+          city: 'San Francisco',
+          state: 'CA',
+          phone: '(415) 474-8600',
+          rating: 4.6,
+          coordinates: [37.7891, -122.4165],
           image: 'https://images.unsplash.com/photo-1516549655169-df83a0774514?w=400&h=300&fit=crop'
         },
         {
           id: '4',
-          title: 'East Jefferson General Hospital',
-          description: 'Civil surgeon services',
-          address: '4200 Houma Blvd',
-          city: 'Metairie',
-          state: 'LA',
-          phone: '(504) 555-2300',
-          rating: 4.6,
-          coordinates: [29.9767, -90.1822],
+          title: 'Golden Gate Immigration Health',
+          description: 'USCIS medical exams, vaccinations, Form I-693',
+          address: '2238 Geary Blvd',
+          city: 'San Francisco',
+          state: 'CA',
+          phone: '(415) 931-5000',
+          rating: 4.4,
+          coordinates: [37.7837, -122.4431],
           image: 'https://images.unsplash.com/photo-1538108149393-fbbd81895907?w=400&h=300&fit=crop'
         }
       ],
       shelter: [
         {
           id: '1',
-          title: 'New Orleans Rescue Mission',
-          description: 'Emergency shelter and meals',
-          address: '1130 Baronne St',
-          city: 'New Orleans',
-          state: 'LA',
-          phone: '(504) 555-3000',
-          rating: 4.4,
-          coordinates: [29.9433, -90.0758],
+          title: 'SF Homeless Outreach Team (SFHOT)',
+          description: 'Street outreach, shelter referrals, homeless services',
+          address: '1500 Mission St',
+          city: 'San Francisco',
+          state: 'CA',
+          phone: '(628) 652-8000',
+          rating: 4.3,
+          coordinates: [37.7728, -122.4194],
           image: 'https://images.unsplash.com/photo-1593113598332-cd288d649433?w=400&h=300&fit=crop'
         },
         {
           id: '2',
-          title: 'Catholic Charities Archdiocese',
-          description: 'Refugee resettlement services',
-          address: '1000 Howard Ave',
-          city: 'New Orleans',
-          state: 'LA',
-          phone: '(504) 555-3100',
-          rating: 4.7,
-          coordinates: [29.9456, -90.0806],
+          title: 'CHANGES Shelter Reservation',
+          description: 'Emergency shelter reservations, same-day placement',
+          address: '1171 Mission St',
+          city: 'San Francisco',
+          state: 'CA',
+          phone: '(415) 487-3300',
+          rating: 4.1,
+          coordinates: [37.7783, -122.4142],
           image: 'https://images.unsplash.com/photo-1469571486292-0ba58a3f068b?w=400&h=300&fit=crop'
         },
         {
           id: '3',
-          title: 'Ozanam Inn',
-          description: 'Homeless shelter for men',
-          address: '843 Camp St',
-          city: 'New Orleans',
-          state: 'LA',
-          phone: '(504) 555-3200',
-          rating: 4.3,
-          coordinates: [29.9478, -90.0708],
+          title: 'Adult Access Point - Sanctuary',
+          description: 'Emergency shelter, transitional housing for adults',
+          address: '201 5th St',
+          city: 'San Francisco',
+          state: 'CA',
+          phone: '(415) 503-6060',
+          rating: 4.4,
+          coordinates: [37.7825, -122.4056],
           image: 'https://images.unsplash.com/photo-1576941089067-2de3c901e126?w=400&h=300&fit=crop'
         },
         {
           id: '4',
-          title: 'Covenant House New Orleans',
-          description: 'Youth shelter ages 16-22',
-          address: '611 N Rampart St',
-          city: 'New Orleans',
-          state: 'LA',
-          phone: '(504) 555-3300',
+          title: 'Compass Family Services',
+          description: 'Family shelter, prevention services, housing assistance',
+          address: '37 Grove St',
+          city: 'San Francisco',
+          state: 'CA',
+          phone: '(415) 644-0504',
           rating: 4.6,
-          coordinates: [29.9614, -90.0644],
+          coordinates: [37.7789, -122.4197],
           image: 'https://images.unsplash.com/photo-1559027615-cd4628902d4a?w=400&h=300&fit=crop'
         }
       ],
       ice: [
         {
           id: '1',
-          title: 'ICE New Orleans Field Office',
-          description: 'Immigration enforcement',
-          address: '1250 Poydras St',
-          city: 'New Orleans',
-          state: 'LA',
-          phone: '(504) 555-4000',
-          rating: 3.8,
-          coordinates: [29.9475, -90.0783],
+          title: 'ICE San Francisco Field Office',
+          description: 'Enforcement and Removal Operations, Northern California',
+          address: '630 Sansome St Rm 590',
+          city: 'San Francisco',
+          state: 'CA',
+          phone: '(415) 365-8800',
+          rating: 3.4,
+          coordinates: [37.7945, -122.4022],
           image: 'https://images.unsplash.com/photo-1565465295423-68c959ca3c5e?w=400&h=300&fit=crop'
         },
         {
           id: '2',
-          title: 'USCIS New Orleans Office',
-          description: 'Benefits and petitions processing',
-          address: '365 Canal St',
-          city: 'New Orleans',
-          state: 'LA',
-          phone: '(504) 555-4100',
-          rating: 4.1,
-          coordinates: [29.9519, -90.0661],
+          title: 'ICE Detained Reporting - SF',
+          description: 'Non-detained reporting location for check-ins',
+          address: '630 Sansome St 4th Floor',
+          city: 'San Francisco',
+          state: 'CA',
+          phone: '(415) 844-5512',
+          rating: 3.2,
+          coordinates: [37.7945, -122.4020],
           image: 'https://images.unsplash.com/photo-1486312338219-ce68d2c6f44d?w=400&h=300&fit=crop'
         },
         {
           id: '3',
-          title: 'Immigration Court New Orleans',
-          description: 'Removal proceedings court',
-          address: '1000 Lafayette St',
-          city: 'New Orleans',
-          state: 'LA',
-          phone: '(504) 555-4200',
-          rating: 3.9,
-          coordinates: [29.9489, -90.0728],
+          title: 'SF Rapid Response Network',
+          description: '24/7 hotline for ICE activity, legal assistance',
+          address: 'San Francisco Bay Area',
+          city: 'San Francisco',
+          state: 'CA',
+          phone: '(415) 200-1548',
+          rating: 4.5,
+          coordinates: [37.7749, -122.4194],
           image: 'https://images.unsplash.com/photo-1589578527966-fdac0f44566c?w=400&h=300&fit=crop'
         },
         {
           id: '4',
-          title: 'Detention Center Information Line',
-          description: 'Detainee locator assistance',
-          address: '1615 Poydras St',
-          city: 'New Orleans',
-          state: 'LA',
-          phone: '(504) 555-4300',
-          rating: 3.5,
-          coordinates: [29.9447, -90.0822],
+          title: 'Contra Costa West County Detention Facility',
+          description: 'ICE detention facility - Bay Area',
+          address: '5555 Giant Hwy',
+          city: 'Richmond',
+          state: 'CA',
+          phone: '(510) 262-4000',
+          rating: 2.9,
+          coordinates: [37.9358, -122.3477],
           image: 'https://images.unsplash.com/photo-1563986768609-322da13575f3?w=400&h=300&fit=crop'
         }
       ]
@@ -627,12 +567,12 @@ export default function App() {
         }))
     }
 
-    const currentListings = newOrleansMockData[activeSubTab] || []
+    const currentListings = sanFranciscoRealData[activeSubTab] || []
     const listingsToShow = convertToListingCards(currentListings)
     const mapMarkers = convertToMapMarkers(currentListings)
     
-    // Center on New Orleans or selected listing
-    const mapCenter = selectedListingCoords || [29.9511, -90.0715]
+    // Center on San Francisco or selected listing
+    const mapCenter = selectedListingCoords || [37.7749, -122.4194]
 
     return (
       <div className="space-y-4">
